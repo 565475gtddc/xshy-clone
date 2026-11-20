@@ -1,0 +1,19 @@
+name: unity-activate
+on:
+  workflow_dispatch:
+jobs:
+  activate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: request activation file
+        run: |
+          mkdir -p out
+          docker run --rm -v "$PWD/out:/out" -w /out \
+            unityci/editor:ubuntu-2022.3.33f1-android-3.1.0 \
+            unity-editor -batchmode -nographics -quit -createManualActivationFile -logFile /dev/stdout || true
+          ls -la
+      - uses: actions/upload-artifact@v4
+        with:
+          name: UnityActivationFile
+          path: out/*.alf
+          if-no-files-found: error

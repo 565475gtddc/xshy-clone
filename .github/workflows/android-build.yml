@@ -1,0 +1,31 @@
+name: android-build
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [ "unity/**" ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-${{ hashFiles('unity/Assets/**') }}
+          restore-keys: Library-
+      - uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          projectPath: unity
+          unityVersion: 2022.3.33f1
+          targetPlatform: Android
+          androidExportType: androidPackage
+          buildName: xshy-clone
+      - uses: actions/upload-artifact@v4
+        with:
+          name: apk
+          path: build/Android

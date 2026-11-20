@@ -1,0 +1,17 @@
+name: unity-activate
+on:
+  workflow_dispatch:
+jobs:
+  activate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 申请激活文件
+        run: |
+          docker run --rm -v "$PWD:/work" -w /work \
+            unityci/editor:ubuntu-2022.3.33f1-android-3.1.0 \
+            unity-editor -batchmode -nographics -quit \
+            -createManualActivationFile -logFile /dev/stdout || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: UnityActivationFile
+          path: "*.alf"
